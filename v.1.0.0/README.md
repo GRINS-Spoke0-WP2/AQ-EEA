@@ -1,4 +1,4 @@
-# Version 1.0.0
+# AQ-EEA v.1.0.0
 
 The following section contains the operations made on the EEA data:
 1. [Download](#EEA-1-Download)
