@@ -11,12 +11,12 @@ rm(list = ls())
 gc()
 
 EEAfiles <-
-  list.files(path = "data/AQ/EEA/raw",
+  list.files(path = "data/raw",
              pattern = ".csv")
 pol_staz_year <- foreach (i = EEAfiles, .combine = rbind) %dopar% {
   print(which(EEAfiles == i))
-  source("script/AQ/EEA/functions.R")
-  df_EEA <- open_raw(i, "data/AQ/EEA/raw")
+  source("script/functions.R")
+  df_EEA <- open_raw(i, "data/raw")
   df_EEA$date <- as_date(df_EEA$DatetimeBegin)
   dd <- df_EEA$date[df_EEA$AveragingTime == "day"]
   dt <- unique(df_EEA$date[duplicated(df_EEA$date)])
@@ -49,17 +49,17 @@ pol_staz_year <- foreach (i = EEAfiles, .combine = rbind) %dopar% {
   pol_staz_year
 }
 save(pol_staz_year,
-     file = "data/AQ/EEA/preprocessing/list_raw_files.Rdata")
+     file = "data/preprocessing/list_raw_files.Rdata")
 
 duplicated_dates <-
   pol_staz_year$name_file[pol_staz_year$duplicated_date == "yes" |
                             pol_staz_year$duplicated_hour == "yes"]
-save(duplicated_dates, file = "data/AQ/EEA/preprocessing/duplicated_rawfiles.Rdata")
+save(duplicated_dates, file = "data/preprocessing/duplicated_rawfiles.Rdata")
 
 double_stations <-
   pol_staz_year[duplicated(pol_staz_year[, c(1:3)]),]
 save(double_stations,
-     file = "data/AQ/EEA/preprocessing/double_stations.Rdata")
+     file = "data/preprocessing/double_stations.Rdata")
 
 #classify problematic files (double)
 names(double_stations)[-c(1:3)] <-
@@ -67,16 +67,16 @@ names(double_stations)[-c(1:3)] <-
 problematic_stations <-
   merge(pol_staz_year[!duplicated(pol_staz_year[, c(1:3)]),], double_stations)
 
-source("script/AQ/EEA/functions.R")
+source("script/functions.R")
 
 removing_files <- c() #files to not be used
 complementary_files <- list() #files complementary
 for (i in 1:nrow(problematic_stations)) {
   #1a
   file1 <- problematic_stations$name_file[i]
-  df_EEA1 <- open_raw(file1, "data/AQ/EEA/raw")
+  df_EEA1 <- open_raw(file1, "data/raw")
   file2 <- problematic_stations$duplicated_name_file[i]
-  df_EEA2 <- open_raw(file2, "data/AQ/EEA/raw")
+  df_EEA2 <- open_raw(file2, "data/raw")
   
   #stessa risoluzione
   if (same_res(df_EEA1, df_EEA2)) {
@@ -168,5 +168,5 @@ for (i in 1:nrow(problematic_stations)) {
   }
 }
 
-save(removing_files,file="data/AQ/EEA/preprocessing/removing_files.Rdata")
-save(complementary_files,file="data/AQ/EEA/preprocessing/complementary_files.Rdata")
+save(removing_files,file="data/preprocessing/removing_files.Rdata")
+save(complementary_files,file="data/preprocessing/complementary_files.Rdata")

@@ -13,7 +13,7 @@ library(lubridate)
 print("starting 2.1 Identify problematic station")
 rm(list = ls())
 gc()
-source("script/AQ/EEA/preprocessing/classify_problematic_rawfiles.R")
+source("script/preprocessing/classify_problematic_rawfiles.R")
 
 ## 2.2 Lighter files from csv to Rdata ####
 
@@ -23,11 +23,11 @@ print("starting 2.2 Lighter files from csv to Rdata")
 rm(list = ls())
 gc()
 EEAfiles <-
-  list.files(path = "data/AQ/EEA/raw",
+  list.files(path = "data/raw",
              pattern = ".csv")
-load("data/AQ/EEA/preprocessing/removing_files.Rdata")
-load("data/AQ/EEA/preprocessing/complementary_files.Rdata")
-load("data/AQ/EEA/preprocessing/duplicated_rawfiles.Rdata")
+load("data/preprocessing/removing_files.Rdata")
+load("data/preprocessing/complementary_files.Rdata")
+load("data/preprocessing/duplicated_rawfiles.Rdata")
 
 EEAfiles <- EEAfiles[which(!EEAfiles %in% removing_files)]
 EEAfiles <- EEAfiles[which(!EEAfiles %in% duplicated_dates)]
@@ -36,13 +36,13 @@ EEAfiles <-
 
 start_time <- Sys.time()
 foreach (i = EEAfiles) %dopar% {
-  source("script/AQ/EEA/functions.R")
-  df_EEA <- open_raw(i, "data/AQ/EEA/raw")
+  source("script/functions.R")
+  df_EEA <- open_raw(i, "data/raw")
   save(
     #require uniqueness if not overwrite
     df_EEA,
     file = paste0(
-      "data/AQ/EEA/preprocessing/1s_1p_1y/",
+      "data/preprocessing/1s_1p_1y/",
       unique(df_EEA$AirQualityStation),
       "_",
       unique(df_EEA$AirPollutant),
@@ -59,23 +59,23 @@ foreach (i = EEAfiles) %dopar% {
 rm(list = ls())
 gc()
 EEAfiles <-
-  list.files(path = "data/AQ/EEA/raw",
+  list.files(path = "data/raw",
              pattern = ".csv")
-load("data/AQ/EEA/preprocessing/removing_files.Rdata")
-load("data/AQ/EEA/preprocessing/complementary_files.Rdata")
-load("data/AQ/EEA/preprocessing/duplicated_rawfiles.Rdata")
+load("data/preprocessing/removing_files.Rdata")
+load("data/preprocessing/complementary_files.Rdata")
+load("data/preprocessing/duplicated_rawfiles.Rdata")
 EEAfiles <- duplicated_dates
 EEAfiles <- EEAfiles[!EEAfiles %in% unlist(complementary_files)]
 
 foreach (i = EEAfiles) %dopar% {
-  source("script/AQ/EEA/functions.R")
-  df_EEA <- open_raw(i, "data/AQ/EEA/raw")
+  source("script/functions.R")
+  df_EEA <- open_raw(i, "data/raw")
   df_EEA <- duplicated_dates_correction(df_EEA)
   save(
     #require uniqueness if not overwrite
     df_EEA,
     file = paste0(
-      "data/AQ/EEA/preprocessing/1s_1p_1y/",
+      "data/preprocessing/1s_1p_1y/",
       unique(df_EEA$AirQualityStation),
       "_",
       unique(df_EEA$AirPollutant),
@@ -92,14 +92,14 @@ foreach (i = EEAfiles) %dopar% {
 rm(list = ls())
 gc()
 EEAfiles <-
-  list.files(path = "data/AQ/EEA/raw",
+  list.files(path = "data/raw",
              pattern = ".csv")
-load("data/AQ/EEA/preprocessing/removing_files.Rdata")
-load("data/AQ/EEA/preprocessing/complementary_files.Rdata")
-load("data/AQ/EEA/preprocessing/duplicated_rawfiles.Rdata")
+load("data/preprocessing/removing_files.Rdata")
+load("data/preprocessing/complementary_files.Rdata")
+load("data/preprocessing/duplicated_rawfiles.Rdata")
 
 foreach (i = 1:length(complementary_files)) %dopar% {
-  source("script/AQ/EEA/functions.R")
+  source("script/functions.R")
   file1 <- complementary_files[[i]][1]
   file2 <- complementary_files[[i]][2]
   if (complementary_files[[i]][3] == "overlap") {
@@ -112,12 +112,12 @@ foreach (i = 1:length(complementary_files)) %dopar% {
   } else{
     same_res <- FALSE
   }
-  df_EEA1 <- open_raw(file1, "data/AQ/EEA/raw")
+  df_EEA1 <- open_raw(file1, "data/raw")
   if (file1 %in% duplicated_dates) {
     df_EEA1 <- duplicated_dates_correction(df_EEA1)
     df_EEA1 <- df_EEA1[,-which(names(df_EEA1)=="date")]
   }
-  df_EEA2 <- open_raw(file2, "data/AQ/EEA/raw")
+  df_EEA2 <- open_raw(file2, "data/raw")
   if (file2 %in% duplicated_dates) {
     df_EEA2 <- duplicated_dates_correction(df_EEA2)
     df_EEA2 <- df_EEA2[,-which(names(df_EEA2)=="date")]
@@ -168,7 +168,7 @@ foreach (i = 1:length(complementary_files)) %dopar% {
     #require uniqueness if not overwrite
     df_EEA,
     file = paste0(
-      "data/AQ/EEA/preprocessing/1s_1p_1y/",
+      "data/preprocessing/1s_1p_1y/",
       unique(df_EEA$AirQualityStation),
       "_",
       unique(df_EEA$AirPollutant),
@@ -189,11 +189,11 @@ rm(list = ls())
 gc()
 
 EEAfiles <-
-  list.files(path = "data/AQ/EEA/preprocessing/1s_1p_1y", pattern = ".Rdata")
+  list.files(path = "data/preprocessing/1s_1p_1y", pattern = ".Rdata")
 
 for (i in EEAfiles) {
   print(which(EEAfiles == i))
-  load(paste0("data/AQ/EEA/preprocessing/1s_1p_1y/", i))
+  load(paste0("data/preprocessing/1s_1p_1y/", i))
   pol <- unique(df_EEA$AirPollutant)
   if (length(pol) == 0) {
     print(i)
@@ -221,7 +221,7 @@ df_AVGTIME <- data.frame(ID_AVGTIME = c(1:length(AVG_TIME)),
 
 df_POL$ID_list <- 1:nrow(df_POL)
 EEARfiles <-
-  list.files(path = "data/AQ/EEA/preprocessing/1s_1p_1y",
+  list.files(path = "data/preprocessing/1s_1p_1y",
              pattern = ".Rdata")
 EEARfiles_p <- list()
 for (p in df_POL$AirPollutant) {
@@ -245,7 +245,7 @@ for (i in 1:length(EEARfiles_p)) {
     if (length(EEARfiles_p_y) > 0) {
       df_EEA <-
         foreach (j = EEARfiles_p_y, .combine = rbind) %dopar% {
-          load(paste0("data/AQ/EEA/preprocessing/1s_1p_1y/", j))
+          load(paste0("data/preprocessing/1s_1p_1y/", j))
           df_EEA <-
             merge(df_AVGTIME, merge(df_POL, df_EEA, all.y =
                                       T) , all.y = T)
@@ -264,7 +264,7 @@ for (i in 1:length(EEARfiles_p)) {
       save(
         df_EEA,
         file = paste0(
-          "data/AQ/EEA/preprocessing/1p_1y/",
+          "data/preprocessing/1p_1y/",
           df_POL$AirPollutant[i],
           "_",
           y,
@@ -284,7 +284,7 @@ print("2.4 Summary analysis of the data")
 rm(list = ls())
 gc()
 
-EEA_files <- list.files(path = "data/AQ/EEA/preprocessing/1p_1y",
+EEA_files <- list.files(path = "data/preprocessing/1p_1y",
                         pattern = ".Rdata")
 EEA_POL <- c()
 for (i in 1:length(EEA_files)) {
@@ -298,7 +298,7 @@ EEA_POL <- unique(EEA_POL)
 for (p in EEA_POL) {
   EEA_files_p <- EEA_files[grep(paste0(p, "_"), EEA_files)]
   df_EEA <- foreach (i = EEA_files_p, .combine = rbind) %dopar% {
-    load(paste0("data/AQ/EEA/preprocessing/1p_1y/", i))
+    load(paste0("data/preprocessing/1p_1y/", i))
     df_EEA
   }
   n <- nrow(df_EEA)
@@ -354,7 +354,7 @@ summary_EEA_df <- summary_EEA_df[,-1]
 summary_EEA_df_1 <- summary_EEA_df[, c(1:3)]
 write.table(
   format(summary_EEA_df_1, scientific = T, digits = 2),
-  file = "data/AQ/EEA/preprocessing/summary/overview.csv",
+  file = "data/preprocessing/summary/overview.csv",
   sep = ",",
   col.names = NA,
   row.names = T
@@ -363,7 +363,7 @@ write.table(
 summary_EEA_df_2 <- summary_EEA_df[, c(4:9)]
 write.table(
   format(summary_EEA_df_2, scientific = T, digits = 2),
-  file = "data/AQ/EEA/preprocessing/summary/validity.csv",
+  file = "data/preprocessing/summary/validity.csv",
   sep = ",",
   col.names = NA,
   row.names = T
@@ -372,7 +372,7 @@ write.table(
 summary_EEA_df_3 <- summary_EEA_df[, c(10:13)]
 write.table(
   format(summary_EEA_df_3, scientific = T, digits = 2),
-  file = "data/AQ/EEA/preprocessing/summary/verification.csv",
+  file = "data/preprocessing/summary/verification.csv",
   sep = ",",
   col.names = NA,
   row.names = T
@@ -381,7 +381,7 @@ write.table(
 summary_EEA_df_4 <- summary_EEA_df[, c(14:16)]
 write.table(
   format(summary_EEA_df_4, scientific = T, digits = 2),
-  file = "data/AQ/EEA/preprocessing/summary/timeres.csv",
+  file = "data/preprocessing/summary/timeres.csv",
   sep = ",",
   col.names = NA,
   row.names = T
@@ -390,7 +390,7 @@ write.table(
 summary_EEA_df_5 <- summary_EEA_df[, c(17:20)]
 write.table(
   format(summary_EEA_df_5, scientific = T, digits = 2),
-  file = "data/AQ/EEA/preprocessing/summary/period.csv",
+  file = "data/preprocessing/summary/period.csv",
   sep = ",",
   col.names = NA,
   row.names = T
@@ -400,7 +400,7 @@ summary_EEA_df <- as.data.frame(t(summary_EEA_df))
 names(summary_EEA_df) <- summary_EEA_df[1,]
 summary_EEA_df <- summary_EEA_df[-1,]
 summary_EEA_df
-write.csv(summary_EEA_df, file = "data/AQ/EEA/preprocessing/summary_EEA_df.csv")
+write.csv(summary_EEA_df, file = "data/preprocessing/summary_EEA_df.csv")
 
 ## 2.5 Anomalies detection ####
 print("starting 2.5 Anomalies detection")
@@ -409,7 +409,7 @@ rm(list = ls())
 gc()
 
 EEA_files <-
-  list.files("data/AQ/EEA/preprocessing/1p_1y", pattern = ".Rdata")
+  list.files("data/preprocessing/1p_1y", pattern = ".Rdata")
 EEA_short <- lapply(EEA_files, function(x) {
   substr(x, 1, nchar(x) - 6)
 })
@@ -423,7 +423,7 @@ all_df <- foreach(p = pol, .combine = rbind) %dopar% {
   #1. tutto il periodo per ogni inquinante
   EEA_pol <- EEA_files[grepl(paste0(p, "_"), EEA_files)]
   for (pol_i in EEA_pol) {
-    load(paste0("data/AQ/EEA/preprocessing/1p_1y/", pol_i))
+    load(paste0("data/preprocessing/1p_1y/", pol_i))
     if (pol_i == EEA_pol[1]) {
       df_EEA_t <- df_EEA
     } else{
@@ -467,7 +467,7 @@ all_df <- foreach(p = pol, .combine = rbind) %dopar% {
 }
 write.table(
   format(all_df, scientific = T, digits = 2),
-  file = "data/AQ/EEA/preprocessing/anomalies/summary_verification.csv",
+  file = "data/preprocessing/anomalies/summary_verification.csv",
   sep = ",",
   col.names = NA
 )
@@ -478,7 +478,7 @@ all_df <- foreach(p = pol, .combine = rbind) %dopar% {
   #1. tutto il periodo per ogni inquinante
   EEA_pol <- EEA_files[grepl(paste0(p, "_"), EEA_files)]
   for (pol_i in EEA_pol) {
-    load(paste0("data/AQ/EEA/preprocessing/1p_1y/", pol_i))
+    load(paste0("data/preprocessing/1p_1y/", pol_i))
     if (pol_i == EEA_pol[1]) {
       df_EEA_t <- df_EEA
     } else{
@@ -528,7 +528,7 @@ all_df <- foreach(p = pol, .combine = rbind) %dopar% {
   }
   all_df
 }
-name_file <- "data/AQ/EEA/preprocessing/anomalies/sigma.csv"
+name_file <- "data/preprocessing/anomalies/sigma.csv"
 write.table(
   format(all_df, digits = 2, scientific = T),
   file = name_file,
@@ -542,7 +542,7 @@ foreach(p = pol) %dopar% {
   #1. tutto il periodo per ogni inquinante
   EEA_pol <- EEA_files[grepl(paste0(p, "_"), EEA_files)]
   for (pol_i in EEA_pol) {
-    load(paste0("data/AQ/EEA/preprocessing/1p_1y/", pol_i))
+    load(paste0("data/preprocessing/1p_1y/", pol_i))
     if (pol_i == EEA_pol[1]) {
       df_EEA_t <- df_EEA
     } else{
@@ -561,12 +561,12 @@ foreach(p = pol) %dopar% {
   df_EEA$Concentration_log <-
     log(df_EEA$Concentration2) #tolti tutti i NA
   name_file <-
-    paste0("plot/AQ/EEA/preprocessing/anomalies/hist", p, ".png")
+    paste0("plot/preprocessing/anomalies/hist", p, ".png")
   png(name_file)
   hist(df_EEA$Concentration, main = p, breaks = 50)
   dev.off()
   name_file <-
-    paste0("plot/AQ/EEA/preprocessing/anomalies/hist", p, "_log.png")
+    paste0("plot/preprocessing/anomalies/hist", p, "_log.png")
   png(name_file)
   hist(df_EEA$Concentration_log,
        main = p,
@@ -582,7 +582,7 @@ fix_thr <-
     print(paste("starting", p))
     EEA_pol <- EEA_files[grepl(paste0(p, "_"), EEA_files)]
     for (pol_i in EEA_pol) {
-      load(paste0("data/AQ/EEA/preprocessing/1p_1y/", pol_i))
+      load(paste0("data/preprocessing/1p_1y/", pol_i))
       if (pol_i == EEA_pol[1]) {
         df_EEA_t <- df_EEA
       } else{
@@ -634,7 +634,7 @@ fix_thr <-
   }
 write.table(
   format(as.data.frame(t(fix_thr)), scientific = T, digits = 2),
-  file = "data/AQ/EEA/preprocessing/anomalies/fix_thr.csv",
+  file = "data/preprocessing/anomalies/fix_thr.csv",
   col.names = NA,
   sep = ","
 )
@@ -646,7 +646,7 @@ foreach(p = pol, .combine = rbind) %dopar% {
   #1. tutto il periodo per ogni inquinante
   EEA_pol <- EEA_files[grepl(paste0(p, "_"), EEA_files)]
   for (pol_i in EEA_pol) {
-    load(paste0("data/AQ/EEA/preprocessing/1p_1y/", pol_i))
+    load(paste0("data/preprocessing/1p_1y/", pol_i))
     if (pol_i == EEA_pol[1]) {
       df_EEA_t <- df_EEA
     } else{
@@ -668,7 +668,7 @@ foreach(p = pol, .combine = rbind) %dopar% {
     pol_cut <- pol_all[pol_all >= pol_thr]
     iter <- which(c(.99, .999, .9999, .99999) == perc)
     name_file <-
-      paste0("plot/AQ/EEA/preprocessing/anomalies/hist_",
+      paste0("plot/preprocessing/anomalies/hist_",
              p,
              "_fix_",
              iter,
@@ -691,7 +691,7 @@ foreach(p = pol, .combine = rbind) %dopar% {
 
 #part 6: subsetting
 EEA_files <-
-  list.files("data/AQ/EEA/preprocessing/1p_1y", pattern = ".Rdata")
+  list.files("data/preprocessing/1p_1y", pattern = ".Rdata")
 EEA_short <- lapply(EEA_files, function(x) {
   nc <- nchar(x)
   substr(x, 1, nc - 6)
@@ -705,19 +705,19 @@ pol_thr <-
     pol = c("CO", "NH3", "NO", "NO2", "O3", "PM10", "PM2.5", "SO2"),
     upp_b = c(100, 50, 1000, 1000, 1000, 2630, 980, 10000)
   )
-write.csv(pol_thr, file = "data/AQ/EEA/preprocessing/anomalies/selected_thresholds.csv")
+write.csv(pol_thr, file = "data/preprocessing/anomalies/selected_thresholds.csv")
 
 foreach(p = pol) %dopar% { 
   EEA_pol <- EEA_files[grepl(paste0(p, "_"), EEA_files)]
   thr <- pol_thr$upp_b[pol_thr$pol == p]
   for (EEA_y in EEA_pol) {
     print(EEA_y)
-    load(paste0("data/AQ/EEA/preprocessing/1p_1y/", EEA_y))
+    load(paste0("data/preprocessing/1p_1y/", EEA_y))
     df_EEA <-
       df_EEA[df_EEA$Validity %in% c(1, 2, 3), ] #tolti tutti i NA
     df_EEA <- df_EEA[df_EEA$Concentration > 0, ] #tolti tutti i NA
     df_EEA <- df_EEA[df_EEA$Concentration < thr, ]
     save(df_EEA,
-         file = paste0("data/AQ/EEA/preprocessing/1p_1y_subsetted/", EEA_y))
+         file = paste0("data/preprocessing/1p_1y_subsetted/", EEA_y))
   }
 }

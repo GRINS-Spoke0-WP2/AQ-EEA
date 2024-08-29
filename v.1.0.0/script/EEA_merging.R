@@ -5,15 +5,15 @@ library(foreach)
 rm(list = ls())
 gc()
 
-daily_files <- list.files("data/AQ/EEA/daily/1p_1s", pattern = ".Rdata")
-load(paste0("data/AQ/EEA/daily/1p_1s/", daily_files[1]))
+daily_files <- list.files("data/daily/1p_1s", pattern = ".Rdata")
+load(paste0("data/daily/1p_1s/", daily_files[1]))
 AirQualityStation <- unique(EEA_daily$AirQualityStation)
 for (d in daily_files[-1]) {
-  load(paste0("data/AQ/EEA/daily/1p_1s/", d))
+  load(paste0("data/daily/1p_1s/", d))
   AirQualityStation <- unique(c(AirQualityStation,
                                 unique(EEA_daily$AirQualityStation)))
 }
-load("data/AQ/EEA/metadataEEA.Rdata")
+load("data/metadataEEA.Rdata")
 EEA_meta <- merge(data.frame(AirQualityStation = AirQualityStation),
                   unique(metadataEEA[, c(2, 7, 8, 9, 11, 12)]),
                   all.x = T)
@@ -35,7 +35,7 @@ for (p in EEA_pol) {
   daily_files_p <- daily_files[grep(paste0(p, "_"), daily_files)]
   EEA_daily <-
     foreach (i = daily_files_p, .combine = rbind) %dopar% {
-      load(paste0("data/AQ/EEA/daily/1p_1s/", i))
+      load(paste0("data/daily/1p_1s/", i))
       EEA_daily
     }
   # save(EEA_daily,file=paste0("data/AQ/EEA/daily/T/",p,".Rdata"))
@@ -47,4 +47,4 @@ for (p in EEA_pol) {
   print(paste(p, "completed"))
 }
 EEA_data <- EEA_all_daily
-save(EEA_data,file="data/AQ/EEA/daily/EEA_dataset.Rdata")
+save(EEA_data,file="data/daily/EEA_dataset.Rdata")

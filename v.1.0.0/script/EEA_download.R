@@ -35,7 +35,7 @@ foreach (i = c(1,5,7,8,10,35,38,6001)) %dopar% {
   if (length(download_links)!=0) {
     for (i in 1:length(download_links)) {
       download.file(download_links[i],
-                    paste0("data/AQ/EEA/raw/",
+                    paste0("data/raw/",
                            basename(download_links[i])))
     } 
   }

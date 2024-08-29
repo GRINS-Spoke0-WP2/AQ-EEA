@@ -12,9 +12,9 @@ library(lubridate)
 rm(list = ls())
 gc()
 
-source("script/AQ/EEA/functions.R")
+source("script/functions.R")
 EEA_files <-
-  list.files("data/AQ/EEA/preprocessing/1p_1y_subsetted", pattern = ".Rdata")
+  list.files("data/preprocessing/1p_1y_subsetted", pattern = ".Rdata")
 EEA_short <- lapply(EEA_files, function(x) {
   nc <- nchar(x)
   substr(x, 1, nc - 6)
@@ -28,7 +28,7 @@ for (p in pol[3:4]) {
   print(paste("starting", p))
   EEA_pol <- EEA_files[grepl(paste0(p, "_"), EEA_files)]
   df_EEA <- foreach (EEA_y = EEA_pol, .combine = rbind) %dopar% {
-    load(paste0("data/AQ/EEA/preprocessing/1p_1y_subsetted/", EEA_y))
+    load(paste0("data/preprocessing/1p_1y_subsetted/", EEA_y))
     print(paste("merged done for", p))
     df_EEA
   }
@@ -71,7 +71,7 @@ for (p in pol[3:4]) {
                stop(paste(s, "in", p, "non ricade in nessun ambito"))
              }
              save(EEA_daily,
-                  file = paste0("data/AQ/EEA/daily/1p_1s/", p, "_", s, ".Rdata"))
+                  file = paste0("data/daily/1p_1s/", p, "_", s, ".Rdata"))
              rm(EEA_daily)
            }
 }
