@@ -17,12 +17,12 @@ c --> f[(EEA_dataset.Rdata)]:::data
 classDef proc fill:#004E5A,color:#FFFFFF
 classDef data fill:#E2FF59,color:#000000
 ```
-The process makes extensive use of the functions contained in the [`functions.R`](script/AQ/EEA/functions.R) script.
+The process makes extensive use of the functions contained in the [`functions.R`](v.1.0.0/script/AQ/EEA/functions.R) script.
 
 
 ### EEA 1: Download
 
-The first script is [`EEA_download.R`](script/AQ/EEA/EEA_download.R). This script makes the request about air pollutants concentrations to the [Air Quality Portal](https://aqportal.discomap.eea.europa.eu) ([download link](https://eeadmz1-cws-wp-air02-dev.azurewebsites.net/download-data/)) managed by the European Environmental Agency (EEA). The request is made for the following pollutants:
+The first script is [`EEA_download.R`](v.1.0.0/script/AQ/EEA/EEA_download.R). This script makes the request about air pollutants concentrations to the [Air Quality Portal](https://aqportal.discomap.eea.europa.eu) ([download link](https://eeadmz1-cws-wp-air02-dev.azurewebsites.net/download-data/)) managed by the European Environmental Agency (EEA). The request is made for the following pollutants:
 
 | | CO | NH<sub>3</sub> | NMVOC | NO | NO<sub>2</sub> | O<sub>3</sub> | PM<sub>10</sub> | PM<sub>2.5</sub> | SO<sub>2</sub> |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -30,7 +30,7 @@ The first script is [`EEA_download.R`](script/AQ/EEA/EEA_download.R). This scrip
 
 Data available in that service come from two dataflows: E1a and E2a. The E1a data are reported to EEA by memberstates every September and covers the year before the delivery. This means that data delivered in September 2023 covers 2022. However, they are not immediatly available. At the moment of our access (12 April 2024) the E1a covers the period until 2021, included. EEA also receives up-to-date (E2a) data with a delay of few weeks (2-3 weeks). Because E1a data are validated and considered an official delivery, all E2a data are deleted before E1a data are imported. This is to ensure that no E2a data are mixed with E1a data. E2a files for the current year are updated once a day. 
 
-From the script `EEA_download.R` raw data are collected in *csv* files in the [raw folder](data/AQ/EEA/raw), each of them corresponding to one station, one pollutant, one year. 
+From the script `EEA_download.R` raw data are collected in *csv* files in the [raw folder](v.1.0.0/data/AQ/EEA/raw), each of them corresponding to one station, one pollutant, one year. 
 
 ### EEA 2: Preprocessing
 
@@ -43,7 +43,7 @@ The raw files downloaded in the [EEA 1: Download](#EEA-1-Download) need to be pr
 
 #### EEA 2.1: Identifying problematic files
 
-Within the raw files, there are some issues, e.g. duplicated measurements (same hours), or two different raw *csv* files contain the same station for the same pollutant and the same period. An automatic procedure address these problems: the script [`classify_problematic_rawfiles.R`](script/AQ/EEA/preprocessing/classify_problematic_rawfiles.R), described in the [Figure 2.1.1](#class_raw), makes the detection and classification of each case. The output of this procedure are in the folder [processing](data/AQ/EEA/processing): 
+Within the raw files, there are some issues, e.g. duplicated measurements (same hours), or two different raw *csv* files contain the same station for the same pollutant and the same period. An automatic procedure address these problems: the script [`classify_problematic_rawfiles.R`](v.1.0.0/script/AQ/EEA/preprocessing/classify_problematic_rawfiles.R), described in the [Figure 2.1.1](#class_raw), makes the detection and classification of each case. The output of this procedure are in the folder [processing](v.1.0.0/data/AQ/EEA/processing): 
 1. *list_raw_files.Rdata* with all input files along with some characteristics
 2. *double_stations.Rdata* with the different files overlapping
 3. *duplicated_raw_files.Rdata* with files containing duplicate measurements
@@ -79,11 +79,11 @@ linkStyle 1,2,3,6,8,10,13 stroke:#00cc00
 
 #### EEA 2.2: Lighter and cleaned tables from *csv* to *Rdata* files
 
-After have identified the problematic files, all the raw *csv* files are opened and some adjustments are made on the table: useless columns are dropped, characters field are converted to numeric, time variable is treated as timedate suitable for R. Then, each station for one year and one pollutant is saved as a dataframe in *Rdata* format and they are contained in the [1s_1p_1y](data/AQ/EEA/1s_1p_1y) folder.
+After have identified the problematic files, all the raw *csv* files are opened and some adjustments are made on the table: useless columns are dropped, characters field are converted to numeric, time variable is treated as timedate suitable for R. Then, each station for one year and one pollutant is saved as a dataframe in *Rdata* format and they are contained in the [1s_1p_1y](v.1.0.0/data/AQ/EEA/1s_1p_1y) folder.
 
 #### EEA 2.3: Binding all stations for same year and pollutant
 
-Information contained in the *Rdata* files within the [1s_1p_1y](data/AQ/EEA/preprocessing/1s_1p_1y) folder (one station, one year, one pollutant), are binded togheter to form single dataframe for each year and pollutant. These new dataframes (including all the stations) are contained in the *Rdata* files within the [1p_1y](data/AQ/EEA/preprocessing/1p_1y) folder.
+Information contained in the *Rdata* files within the [1s_1p_1y](v.1.0.0/data/AQ/EEA/preprocessing/1s_1p_1y) folder (one station, one year, one pollutant), are binded togheter to form single dataframe for each year and pollutant. These new dataframes (including all the stations) are contained in the *Rdata* files within the [1p_1y](v.1.0.0/data/AQ/EEA/preprocessing/1p_1y) folder.
 
 #### EEA 2.4: Summary analysis of the data
 
@@ -241,7 +241,7 @@ Considering jointly the tables and the histograms, fixed thresholds are decided 
 | avg_4   | 5.1e-01 | 5.8e+00 | 2.2e+01 | 1.2e+01 | 5.7e+01 | 2.3e+01 | 1.5e+01 | 3.1e+00 |
 | sd_4    | 4.2e-01 | 2.7e+00 | 2.0e+01 | 2.5e+01 | 3.5e+01 | 1.8e+01 | 1.8e+01 | 4.0e+00 |
 
-![thr_hist](plot/AQ/EEA/preprocessing/anomalies/hist_PM2.5_fix_3_thr.png) ![thr_hist](plot/AQ/EEA/preprocessing/anomalies/hist_PM2.5_fix_4_thr.png)
+![thr_hist](v.1.0.0/plot/preprocessing/anomalies/hist_PM2.5_fix_3_thr.png) ![thr_hist](v.1.0.0/plot/preprocessing/anomalies/hist_PM2.5_fix_4_thr.png)
 
 *Figure 2.5.1 histograms of PM<sub>2.5</sub> observations excluded by the thresholds identified by the 99.99% percentile (left) and 99.999% percentile (right). Coloured according to the monitoring station*
 
@@ -259,7 +259,7 @@ Considering jointly the tables and the histograms, fixed thresholds are decided 
 
 ### EEA 3: Change of temporal resolution
 
-The change of the temporal resolution is made by the [`EEA_HtoD.R`](script/AQ/EEA/EEA_HtoD.R) script. This script takes in input the subsetted data after the anomalies detection and removal as described in [EEA 2.5: Anomalies detection and removal](#EEA-25-Anomalies-detection-and-removal) and convert the temporal resolution of the observations into daily data. to retain as much information as possible, the daily minimum, 1st quartile, mean, median, 3rd quartile and maximum are kept from hourly data. Moreover, to avoid distortions in the calculation of these indices, missing hourly data are imputed with the Kalman smoother. However, for days with more than 5 consecutive missing hourly data, the day is considered as missing. The functioning is described below:
+The change of the temporal resolution is made by the [`EEA_HtoD.R`](v.1.0.0/script/AQ/EEA/EEA_HtoD.R) script. This script takes in input the subsetted data after the anomalies detection and removal as described in [EEA 2.5: Anomalies detection and removal](#EEA-25-Anomalies-detection-and-removal) and convert the temporal resolution of the observations into daily data. to retain as much information as possible, the daily minimum, 1st quartile, mean, median, 3rd quartile and maximum are kept from hourly data. Moreover, to avoid distortions in the calculation of these indices, missing hourly data are imputed with the Kalman smoother. However, for days with more than 5 consecutive missing hourly data, the day is considered as missing. The functioning is described below:
 
 ```mermaid
 graph LR;
@@ -280,4 +280,4 @@ d --> df
 classDef fun fill:#004E5A,color:#FFFFFF
 classDef disc fill:#E2FF59,color:#000000
 ```
-After the convertion to daily data the file *EEA_dataset.Rdata* is created containing all the stations and all the day from 2013 to 2023 with for every pollutants concentrations measured the summary statistics (min, 1st quartile, mean, median, 3rd quartile, maximum). The merge is made by the script [`EEA_merging.R`](script/AQ/EEA/EEA_merging.R).
+After the convertion to daily data the file *EEA_dataset.Rdata* is created containing all the stations and all the day from 2013 to 2023 with for every pollutants concentrations measured the summary statistics (min, 1st quartile, mean, median, 3rd quartile, maximum). The merge is made by the script [`EEA_merging.R`](v.1.0.0/script/AQ/EEA/EEA_merging.R).
