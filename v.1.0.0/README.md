@@ -1,6 +1,6 @@
 # AQ-EEA/v.1.0.0
 
-The following section contains the operations made on the EEA data:
+The following section illustrates the operations to reproduce the AQ-EEA v.1.0.0 dataset:
 1. [Download](#EEA-1-Download)
 2. [Preprocess](#EEA-2-Preprocessing)
 3. [Change of temporal resolution](#EEA-3-Change-of-temporal-resolution)
