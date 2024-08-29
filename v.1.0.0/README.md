@@ -17,7 +17,7 @@ c --> f[(EEA_dataset.Rdata)]:::data
 classDef proc fill:#004E5A,color:#FFFFFF
 classDef data fill:#E2FF59,color:#000000
 ```
-The process makes extensive use of the functions contained in the [`functions.R`](v.1.0.0/script/AQ/EEA/functions.R) script.
+The process makes extensive use of the functions contained in the [`functions.R`](script/AQ/EEA/functions.R) script.
 
 
 ### EEA 1: Download
