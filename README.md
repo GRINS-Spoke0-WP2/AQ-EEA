@@ -1,6 +1,6 @@
 # Air Quality data from European Environmental Agency (AQ-EEA)
 
-For the Italian domain, we retrieve measured concentrations of air pollution from the European Environmental Agency (EEA). AQ-EEA data contain measurements from the ground monitoring stations for the period 2000-2024.
+For the Italian domain, we retrieve measured concentrations of air pollution from the European Environmental Agency (EEA). 
 
 ## Versions
 
