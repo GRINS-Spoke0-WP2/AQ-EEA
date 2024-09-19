@@ -15,7 +15,7 @@ rm(list = ls())
 gc()
 source("script/preprocessing/classify_problematic_rawfiles.R")
 
-## 2.2 Lighter files from csv to Rdata ####
+## 2.2 Fixing stations (csv to Rdata) ####
 
 #ok stations
 print("starting 2.2 Lighter files from csv to Rdata")
