@@ -5,7 +5,6 @@ library(foreach)
 library(httr)
 registerDoParallel(cores=detectCores())
 
-#download data for January 2020
 base_url <- "https://fme.discomap.eea.europa.eu/fmedatastreaming/AirQualityDownload/AQData_Extract.fmw"
 
 # Define parameters
