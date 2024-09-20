@@ -24,9 +24,9 @@ The process makes extensive use of the functions contained in the [`functions.R`
 
 The first script is [`EEA_download.R`](script/EEA_download.R). This script makes the request about air pollutants concentrations to the [Air Quality Portal](https://aqportal.discomap.eea.europa.eu) ([download link](https://eeadmz1-cws-wp-air02-dev.azurewebsites.net/download-data/)) managed by the European Environmental Agency (EEA). The request is made for the following pollutants:
 
-| | CO | NH<sub>3</sub> | NMVOC | NO | NO<sub>2</sub> | O<sub>3</sub> | PM<sub>10</sub> | PM<sub>2.5</sub> | SO<sub>2</sub> |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| **EEA Code** | 10 | 35 | 33 | 38 | 8 | 7 | 5 | 6001 | 1 |
+| | CO | NH<sub>3</sub> | NO | NO<sub>2</sub> | O<sub>3</sub> | PM<sub>10</sub> | PM<sub>2.5</sub> | SO<sub>2</sub> |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| **EEA Code** | 10 | 35 | 38 | 8 | 7 | 5 | 6001 | 1 |
 
 Data available in that service come from two dataflows: E1a and E2a. The E1a data are reported to EEA by memberstates every September and covers the year before the delivery. This means that data delivered in September 2023 covers 2022. However, they are not immediatly available. At the moment of our access (12 April 2024) the E1a covers the period until 2021, included. EEA also receives up-to-date (E2a) data with a delay of few weeks (2-3 weeks). Because E1a data are validated and considered an official delivery, all E2a data are deleted before E1a data are imported. This is to ensure that no E2a data are mixed with E1a data. E2a files for the current year are updated once a day. 
 
