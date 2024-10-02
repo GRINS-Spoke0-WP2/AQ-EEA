@@ -1,6 +1,6 @@
 # Air Quality data from European Environmental Agency (AQ-EEA)
 
-For the Italian domain, we retrieve measured concentrations of air pollution from the European Environmental Agency (EEA). More specifically, the European agency receives data from the national agency. Data are providede thorugh the [European Air Quality Portal](https://aqportal.discomap.eea.europa.eu/) under the "Data Download" section. Three datasets are available: 
+For the Italian domain, we retrieve measured concentrations of air pollution from the European Environmental Agency (EEA). More specifically, the European agency receives data from the national agency. Data are provided thorugh the [European Air Quality Portal](https://aqportal.discomap.eea.europa.eu/) under the "Data Download" section. Three datasets are available: 
 - Airbase
 - E1a
 - E2a
