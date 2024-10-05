@@ -1,5 +1,5 @@
 # 1. EEA download ####
-
+setwd("AQ-EEA")
 library(doParallel)
 library(foreach)
 library(httr)

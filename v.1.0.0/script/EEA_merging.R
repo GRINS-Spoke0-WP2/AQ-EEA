@@ -4,6 +4,7 @@ library(foreach)
 
 rm(list = ls())
 gc()
+setwd("AQ-EEA")
 
 daily_files <- list.files("data/daily/1p_1s", pattern = ".Rdata")
 load(paste0("data/daily/1p_1s/", daily_files[1]))

@@ -8,6 +8,7 @@ library(foreach)
 library(httr)
 registerDoParallel(cores = detectCores())
 library(lubridate)
+setwd("AQ-EEA")
 
 ## 2.1 Identify problematic station ####
 print("starting 2.1 Identify problematic station")
