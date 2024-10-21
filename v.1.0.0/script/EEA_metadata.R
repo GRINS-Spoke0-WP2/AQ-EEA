@@ -2,7 +2,7 @@ library(httr)
 
 download.file("https://discomap.eea.europa.eu/map/fme/metadata/PanEuropean_metadata.csv",
               destfile = "data/raw_metadata.csv")
-setwd("AQ-EEA")
+setwd("AQ-EEA/v.1.0.0")
 library(readr)
 PanEuropean_metadata <-
   read_delim(

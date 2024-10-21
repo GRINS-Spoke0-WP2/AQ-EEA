@@ -11,7 +11,7 @@ library(lubridate)
 
 rm(list = ls())
 gc()
-setwd("AQ-EEA")
+setwd("AQ-EEA/v.1.0.0")
 source("script/functions.R")
 EEA_files <-
   list.files("data/preprocessing/1p_1y_subsetted", pattern = ".Rdata")

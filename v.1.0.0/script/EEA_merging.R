@@ -4,7 +4,7 @@ library(foreach)
 
 rm(list = ls())
 gc()
-setwd("AQ-EEA")
+setwd("AQ-EEA/v.1.0.0")
 
 daily_files <- list.files("data/daily/1p_1s", pattern = ".Rdata")
 load(paste0("data/daily/1p_1s/", daily_files[1]))
@@ -47,5 +47,5 @@ for (p in EEA_pol) {
   }
   print(paste(p, "completed"))
 }
-EEA_data <- EEA_all_daily
-save(EEA_data,file="data/daily/EEA_dataset.Rdata")
+AQ_EEA_v100_df <- EEA_all_daily
+save(AQ_EEA_v100_df,file="data/daily/AQ_EEA_v100_df.rda")

@@ -2,7 +2,7 @@ library(doParallel)
 library(foreach)
 library(httr)
 registerDoParallel(cores=detectCores())
-setwd("AQ-EEA")
+setwd("AQ-EEA/v.1.0.0")
 base_url <- "https://fme.discomap.eea.europa.eu/fmedatastreaming/AirQualityDownload/AQData_Extract.fmw"
 
 for(i in c(1,5,7,8,10,35,38,6001)) { 

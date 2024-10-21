@@ -8,7 +8,7 @@ library(foreach)
 library(httr)
 registerDoParallel(cores = detectCores())
 library(lubridate)
-setwd("AQ-EEA")
+setwd("AQ-EEA/v.1.0.0") #version
 
 ## 2.1 Identify problematic station ####
 print("starting 2.1 Identify problematic station")

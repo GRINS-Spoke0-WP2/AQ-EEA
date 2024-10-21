@@ -1,5 +1,5 @@
 # 1. EEA download ####
-setwd("AQ-EEA")
+setwd("AQ-EEA/v.1.0.0")
 library(doParallel)
 library(foreach)
 library(httr)

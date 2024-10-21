@@ -6,7 +6,7 @@ library(foreach)
 library(httr)
 registerDoParallel(cores = detectCores())
 library(lubridate)
-setwd("AQ-EEA")
+setwd("AQ-EEA/v.1.0.0")
 rm(list = ls())
 gc()
 
