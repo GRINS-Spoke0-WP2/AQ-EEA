@@ -60,7 +60,7 @@ sv -->|Yes| d(One is discarded):::disc
 sv -->|No| f{{Same number of valid data?}}
 f -->|No| d
 f -->|Yes| e[Error!]:::err
-c -->|No| t{{All different times?}}
+c -->|No| t{{Overlapping time stamps?}}
 t -->|Yes| cc(Complementary):::comp
 t -->|No| dt{{Same values at same time?}}
 dt -->|Yes| cc
