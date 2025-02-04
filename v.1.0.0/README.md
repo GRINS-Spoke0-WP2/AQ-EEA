@@ -52,7 +52,8 @@ Within the raw files, there are some issues, e.g. duplicated measurements (same 
 
 ```mermaid
 graph TD;
-a(Open both problematic files)-->b{{Same resolution?}}
+a(Open both problematic files)-->b{{Same temporal resolution?}}
+
 b -->|Yes| c{{Same number of rows?}}
 c -->|Yes| sv{{Same values?}}
 sv -->|Yes| d(One is discarded):::disc
