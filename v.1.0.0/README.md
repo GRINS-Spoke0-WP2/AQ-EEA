@@ -73,7 +73,7 @@ classDef disc fill:#ffff00,color:#000000
 classDef comp fill:#00cc00,color:#000000
 linkStyle default stroke:#ff0000
 linkStyle 0 stroke:gray
-linkStyle 1,2,3,6,8,10,13 stroke:#00cc00
+linkStyle 1,2,3,6,9,10,13 stroke:#00cc00
 ```
 
 *Figure 2.1.1 Automatic procedure for the detection and removal of problematic raw files*
