@@ -61,8 +61,8 @@ sv -->|No| f{{Same number of valid data?}}
 f -->|No| d
 f -->|Yes| e[Error!]:::err
 c -->|No| t{{Overlapping time stamps?}}
-t -->|Yes| cc(Complementary):::comp
-t -->|No| dt{{Same values at same time?}}
+t -->|No| cc(Complementary):::comp
+t -->|Yes| dt{{Same values at same time?}}
 dt -->|Yes| cc
 dt -->|No| f
 b -->|No| oc{{One contains the other?}}

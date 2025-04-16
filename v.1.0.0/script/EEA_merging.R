@@ -14,6 +14,7 @@ for (d in daily_files[-1]) {
   AirQualityStation <- unique(c(AirQualityStation,
                                 unique(EEA_daily$AirQualityStation)))
 }
+source("script/EEA_metadata.R")
 load("data/metadataEEA.Rdata")
 EEA_meta <- merge(data.frame(AirQualityStation = AirQualityStation),
                   unique(metadataEEA[, c(2, 7, 8, 9, 11, 12)]),
