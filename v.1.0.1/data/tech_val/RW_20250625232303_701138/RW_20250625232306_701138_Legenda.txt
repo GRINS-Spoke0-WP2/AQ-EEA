@@ -1,0 +1,40 @@
+AirQualityStation-time
+
+The dataset contains the concentration of several air pollutant concentrations measured by the monitoring stations. Period covered is xxx-xxxx. Area is Italy. Some climate variables are also available. Is part of a bigger dataset from 2013-2023. Please cite https://zenodo.org/records/15699806 if you are using.
+
+https://aqportal.discomap.eea.europa.eu
+https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels?tab=overview
+
+
+Data manager alessandro.fustamoro
+Contact provider alessandro.fustamoro@unibg.it
+Owner UNIBG		
+Publisher GRINS
+
+
+CC BY-SA
+
+Category	Ambiente
+PNRR Themes	Territorial Gaps
+Grins Themes	Sustainable
+Languages	Italiano, Inglese
+Data Frequency	Daily
+Type Source	Dato ufficiale
+Aggregation Level	aggregato
+Geographical Coverage	Nazionali
+Record Identifier	PRO_COM,Time
+ID - Validation Metadata ML	
+
+Tag Name	Tag Description
+spoke0	gruppo spoke0
+Ambiente	dati su fenomeni atmosferici
+
+
+A.
+Official data from European Environmental Agency and Copernicus
+A.
+Code available on GitHub repository GRINS-Spoke0-WP02 at the repositories AQ-EEA and WE-C3s
+A.
+Data descriptor article in preparation
+
+See technical validation of the companion paper

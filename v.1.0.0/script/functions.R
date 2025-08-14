@@ -153,25 +153,30 @@ duplicated_dates_correction <-
 #HtoD ####
 lag_na <- function(sub) {
   sub$lag_na <- NA
-  # apply(sub, 1, function(x)
-  sub$lag_na[1] <- 0
-  if (is.na(sub$Concentration[1])) {
-    sub$lag_na[1] <- 1
-  }
-  for (i in 2:nrow(sub)) {
-    if (is.na(sub$Concentration[i]))
-    {
-      sub$lag_na[i] <- sub$lag_na[i - 1] + 1
-    } else{
-      sub$lag_na[i] <- 0
-    }
-    if (as_date(sub$DatetimeBegin[i]) != as_date(sub$DatetimeBegin[i -
-                                                                   1]) &
-        sub$lag_na[i] != 0)
-    {
-      sub$lag_na[i] <- sub$lag_na[i] - sub$lag_na[i - 1]
-    }
-  }
+  day   <- as.Date(format(sub$DatetimeBegin,"%Y-%m-%d"))
+  is_na <- is.na(sub$Concentration)
+  new_day <- c(TRUE, day[-1] != day[-length(day)])
+  grp <- cumsum(!is_na | new_day)
+  sub$lag_na <- ifelse(is_na, ave(is_na, grp, FUN = cumsum), 0L)
+  # sub$lag_na <- NA
+  # sub$lag_na[1] <- 0
+  # if (is.na(sub$Concentration[1])) {
+  #   sub$lag_na[1] <- 1
+  # }
+  # for (i in 2:nrow(sub)) {
+  #   if (is.na(sub$Concentration[i]))
+  #   {
+  #     sub$lag_na[i] <- sub$lag_na[i - 1] + 1
+  #   } else{
+  #     sub$lag_na[i] <- 0
+  #   }
+  #   if (as_date(sub$DatetimeBegin[i]) != as_date(sub$DatetimeBegin[i -
+  #                                                                  1]) &
+  #       sub$lag_na[i] != 0)
+  #   {
+  #     sub$lag_na[i] <- sub$lag_na[i] - sub$lag_na[i - 1]
+  #   }
+  # }
   date_tobe_excl <-
     unique(as_date(sub$DatetimeBegin[sub$lag_na > 6]))
   return(date_tobe_excl)
@@ -230,7 +235,6 @@ hourly <- function(sub, s) {
   }else{
     return(sub)
   }
-  
 }
 
 imputation <- function(sub, s, date_tobe_excl) {
@@ -243,7 +247,18 @@ imputation <- function(sub, s, date_tobe_excl) {
     return(sub)
   } else if (length(date_tobe_excl) != length(unique(as_date(sub$DatetimeBegin)))) {
     print(paste0("making kalman on ", s))
-    sub$Concentration <- na_kalman(sub$Concentration)
+    na_idx_k <- is.na(sub$Concentration)
+    if(na_idx_k[1]==T){
+      na_rm_init <- match(FALSE,na_idx_k)
+      str1 <- StructTS(sub$Concentration[-c(1:na_rm_init)],type = "level")
+    }else{
+      str1 <- StructTS(sub$Concentration,type = "level")
+    }
+    y_kalm <- KalmanSmooth(sub$Concentration,str1$model)
+    sub$Concentration[na_idx_k] <- c(y_kalm[[1]])[na_idx_k]
+    sub$var_kalman <- c(y_kalm[[2]])
+    sub$var_kalman[!na_idx_k] <- 0
+    # sub$Concentration <- na_kalman(sub$Concentration)
     sub$time <- as_date(sub$DatetimeBegin)
     return(sub)
   } else {
@@ -261,7 +276,8 @@ daily_average <- function(sub, s, date_tobe_excl) {
       mean = mean(Concentration),
       med = median(Concentration),
       q3 = quantile(Concentration, probs = .75),
-      max = max(Concentration)
+      max = max(Concentration),
+      var_kalman = (var_kalman) # add dividing by n2 (covariance?)
     )
   EEA_daily$AirQualityStation <- s
   EEA_daily <- EEA_daily[, c(8, 1:7)]

@@ -1,9 +1,10 @@
-# 3. Change temporal resolution ####
+a# 3. Change temporal resolution ####
 
 #This script convert hourly measurements into daily data
 
 library(doParallel)
-registerDoParallel(cores=detectCores()/2)
+detectCores()
+registerDoParallel(cores=6)
 library(foreach)
 library(dplyr)
 library(imputeTS)
@@ -11,7 +12,7 @@ library(lubridate)
 
 rm(list = ls())
 gc()
-try(setwd("AQ-EEA/v.1.0.0"))
+setwd("AQ-EEA/v.1.0.0")
 source("script/functions.R")
 EEA_files <-
   list.files("data/preprocessing/1p_1y_subsetted", pattern = ".Rdata")
@@ -23,7 +24,7 @@ EEA_short <- unlist(EEA_short)
 pol <-
   unique(sapply(EEA_short, function(x)
     substring(x, 1, nchar(x) - 5)))
-  # p <- pol[1]
+
 for (p in pol) {
   print(paste("starting", p))
   EEA_pol <- EEA_files[grepl(paste0(p, "_"), EEA_files)]
@@ -33,8 +34,8 @@ for (p in pol) {
     df_EEA
   }
   stazz <- unique(df_EEA$AirQualityStation)
-  foreach (s = stazz, # s = stazz[1]
-           .packages = c("lubridate", "imputeTS")) %dopar% {
+  foreach (s = stazz,
+           .packages = c("lubridate", "imputeTS")) %do% {
              print(paste(round((
                which(stazz == s) / length(stazz)
              ) * 100, 2), "%"))
