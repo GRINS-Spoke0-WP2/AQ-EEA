@@ -214,7 +214,12 @@ daily <- function(sub, s) {
   names(EEA_daily)[-c(1, 2)] <-
     paste0(names(EEA_daily)[-c(1, 2)], "_", p)
   EEA_daily <- as.data.frame(EEA_daily)
-  return(EEA_daily)
+  EEA_daily_uncertainty <- EEA_daily
+  EEA_daily_uncertainty[!is.na(EEA_daily[,3]),-c(1,2)] <- 0
+  EEA_daily_uncertainty[is.na(EEA_daily[,3]),-c(1,2)] <- NA
+  names(EEA_daily_uncertainty)[-c(1,2)]<-paste0("sd_",names(EEA_daily_uncertainty)[-c(1,2)])
+  return(list(EEA_daily=EEA_daily,
+              EEA_daily_uncertainty=EEA_daily_uncertainty))
 }
 
 hourly <- function(sub, s) {
@@ -228,18 +233,18 @@ hourly <- function(sub, s) {
   sub <- merge(data.frame(DatetimeBegin), sub, all.x = T)
   sub$AirQualityStation <- s
   date_tobe_excl <- lag_na(sub)
-  sub <- imputation(sub, s, date_tobe_excl)
-  if (nrow(sub)>0) {
-    sub <- daily_average(sub, s, date_tobe_excl)
-    return(sub)
+  sub_list <- imputation(sub, s, date_tobe_excl)
+  if (nrow(sub_list[[1]])>0) {
+    daily_list <- daily_average(sub_list, s, date_tobe_excl)
+    return(daily_list)
   }else{
-    return(sub)
+    return(sub_list)
   }
 }
 
 imputation <- function(sub, s, date_tobe_excl) {
   if (length(unique(sub$Concentration[!is.na(sub$Concentration)])) ==
-      1) {
+      1) { # QUESTA NO !
     sub$Concentration <-
       unique(sub$Concentration[!is.na(sub$Concentration)])
     sub$time <- as_date(sub$DatetimeBegin)
@@ -250,24 +255,44 @@ imputation <- function(sub, s, date_tobe_excl) {
     na_idx_k <- is.na(sub$Concentration)
     if(na_idx_k[1]==T){
       na_rm_init <- match(FALSE,na_idx_k)
-      str1 <- StructTS(sub$Concentration[-c(1:na_rm_init)], type = "level", fixed = c(NA,1))
+      na_rm_init <- na_rm_init - 1
+      str1 <- StructTS(sub$Concentration[-c(1:na_rm_init)], type = "level", fixed = c(NA,0))
     }else{
-      str1 <- StructTS(sub$Concentration,type = "level", fixed = c(NA,1))
+      str1 <- StructTS(sub$Concentration,type = "level", fixed = c(NA,0))
     }
     y_kalm <- KalmanSmooth(sub$Concentration,str1$model)
-    sub$Concentration[na_idx_k] <- c(y_kalm[[1]])[na_idx_k]
-    sub$var_imputation <- c(y_kalm[[2]])
-    sub$var_imputation[!na_idx_k] <- 0
+    summary(y_kalm$var)
+    
+    # sub$Concentration[na_idx_k] <- c(y_kalm[[1]])[na_idx_k]
     # sub$Concentration <- na_kalman(sub$Concentration)
+    if(na_idx_k[1]==T){
+      a_1 <- sub$Concentration[na_rm_init+1]
+      }else{a_1 <- sub$Concentration[1]}
+    sd_eps <- 0
+    sd_eta <- as.numeric(sqrt(str1$coef[1]))
+    kalman_start <- list(
+      a_1 = a_1,
+      P_1 = (sd_eps^2) + (sd_eta^2),
+      sigma_eta = sd_eta,
+      sigma_eps = sd_eps
+    )
+    my_y_kalm <- my_kalman_smoother(sub$Concentration,
+                                    kalman_start = kalman_start)
+    if(length(sub$Concentration) != length(my_y_kalm$state)){
+      stop("sub$concentrations and kalman smoother differ!")
+    } 
+    sub$Concentration[na_idx_k] <- my_y_kalm$state[na_idx_k]
     sub$time <- as_date(sub$DatetimeBegin)
-    return(sub)
+    my_y_kalm$variance[my_y_kalm$variance<0] <- ceiling(my_y_kalm$variance[my_y_kalm$variance<0])
+    return(list(sub=sub,Kdf=my_y_kalm)) #sub_list <- list(sub=sub,Kdf=my_y_kalm)
   } else {
     sub <- sub[-c(1:nrow(sub)),]
     return(sub)
   }
 }
 
-daily_average <- function(sub, s, date_tobe_excl) {
+daily_average <- function(sub_list, s, date_tobe_excl) {
+  sub <- sub_list[[1]]
   EEA_daily <- sub %>%
     group_by(time) %>%
     summarise(
@@ -277,7 +302,6 @@ daily_average <- function(sub, s, date_tobe_excl) {
       med = median(Concentration),
       q3 = quantile(Concentration, probs = .75),
       max = max(Concentration),
-      var_kalman = (var_kalman) # add dividing by n2 (covariance?)
     )
   EEA_daily$AirQualityStation <- s
   EEA_daily <- EEA_daily[, c(8, 1:7)]
@@ -285,5 +309,175 @@ daily_average <- function(sub, s, date_tobe_excl) {
     paste0(names(EEA_daily)[-c(1, 2)], "_", p)
   EEA_daily <- as.data.frame(EEA_daily)
   EEA_daily <- EEA_daily[!EEA_daily$time %in% date_tobe_excl,]
-  return(EEA_daily)
+  
+  EEA_daily_uncertainty <- EEA_daily
+  EEA_daily_uncertainty[!is.na(EEA_daily[,3]),-c(1,2)] <- 0
+  names(EEA_daily_uncertainty)[-c(1,2)]<-paste0("sd_",names(EEA_daily_uncertainty)[-c(1,2)])
+  Kdf <- sub_list$Kdf
+  Kdf_t <- cbind(sub$time,Kdf)
+  names(Kdf_t)[1]<-"time"
+  for (d in unique(Kdf_t$time)) { #d <- unique(Kdf_t$time)[1] # d <- as.Date("2015-01-14") #d <- as.Date(17784)
+    if (d %in% date_tobe_excl){next} # d <- as.Date("2013-05-14") d <- as.Date("2023-11-25")
+    sub_kdf <- subset(Kdf_t,time==d)
+    pos_imp <- which(is.na(sub_kdf$data_y))
+    if(length(pos_imp)==0){next}
+    n_div <- (1/24)^2
+    single_variance <- sum(sub_kdf$variance[pos_imp])
+    Vt_mat <- matrix(0,24,24)
+    for (i in pos_imp) {
+      for (j in pos_imp) {
+        if(j>i){
+          Vt_mat[i,j] <- sub_kdf$Pt_filter[i]*prod(
+            sub_kdf$Lt[i:(j-1)])*(1-(sub_kdf$Nt[j-1]*sub_kdf$Pt_filter[j])
+          )
+        }
+      }
+    }
+    covariances <- 2*sum(c(Vt_mat))
+    mean_variance <- n_div *(single_variance + covariances)
+    EEA_daily_uncertainty[EEA_daily_uncertainty$time==d,
+                          grep("mean",names(EEA_daily_uncertainty))] <- sqrt(mean_variance)
+
+    if(min(sub_kdf$state[pos_imp]) < min(sub_kdf$data_y,na.rm = T)){
+      pos_min_imp <- which(sub_kdf$state==min(sub_kdf$state[pos_imp]))
+      min_variance <- min(sub_kdf$variance[pos_min_imp])
+    }else{
+      min_variance <- 0
+    }
+    if(max(sub_kdf$state[pos_imp]) > max(sub_kdf$data_y,na.rm = T)){
+      pos_max_imp <- which(sub_kdf$state==max(sub_kdf$state[pos_imp]))
+      max_variance <- min(sub_kdf$variance[pos_max_imp])
+    }else{
+      max_variance <- 0
+    }
+    print(d)
+    EEA_daily_uncertainty[EEA_daily_uncertainty$time==d,
+                          grep("min",names(EEA_daily_uncertainty))] <- sqrt(min_variance)
+    EEA_daily_uncertainty[EEA_daily_uncertainty$time==d,
+                          grep("max",names(EEA_daily_uncertainty))] <- sqrt(max_variance)
+    
+    x_full <- c(sub_kdf$data_y)
+    x_full[pos_imp] <- sub_kdf$state[pos_imp]
+    x_full <- cbind(x_full,1:24)
+    colnames(x_full)<-c("x","i")
+    x_ordered <- x_full[order(x_full[,1]),]
+    n <- nrow(x_ordered)
+    for (pq in c(0.25,.5,.75)) {
+      m <- (1-pq)
+      j <- floor(n*pq + m)
+      gamma <- n*pq + m - j
+      var_j <- var_j1 <- cov_jj1 <- 0
+      if (x_ordered[j,2] %in% pos_imp){
+        var_j <- ((1-gamma)^2)*sub_kdf$variance[x_ordered[j,2]]
+      }
+      if (x_ordered[(j+1),2] %in% pos_imp){
+        var_j1 <- (gamma^2)*sub_kdf$variance[x_ordered[(j+1),2]]
+      }
+      if(x_ordered[j,2] %in% pos_imp & x_ordered[(j+1),2] %in% pos_imp){
+      cov_jj1 <- gamma * (1-gamma) * Vt_mat[x_ordered[j,2],x_ordered[(j+1),2]]}
+      var_quantile <- sum(var_j,var_j1,cov_jj1)
+      if(p==.25){
+      var_q1 <- var_quantile
+      }
+      if(p==.5){
+      var_med <- var_quantile
+      }
+      if(p==.75){
+      var_q3 <- var_quantile
+      }
+    }
+    EEA_daily_uncertainty[EEA_daily_uncertainty$time==d,
+                          grep("q1",names(EEA_daily_uncertainty))] <- sqrt(var_q1)
+    EEA_daily_uncertainty[EEA_daily_uncertainty$time==d,
+                          grep("med",names(EEA_daily_uncertainty))] <- sqrt(var_med)
+    EEA_daily_uncertainty[EEA_daily_uncertainty$time==d,
+                          grep("q3",names(EEA_daily_uncertainty))] <- sqrt(var_q3)
+    
+  }
+  
+  # n <- length(x)
+  # m <- (1-p)
+  # j <- floor(n*p + m)
+  # gamma <- n*p + m - j
+  # Q <- ((1-gamma)*x[j])+(gamma*x[j+1])
+  
+  return(list(EEA_daily=EEA_daily,
+              EEA_daily_uncertainty=EEA_daily_uncertainty))
+  # daily_list <- list(EEA_daily=EEA_daily,EEA_daily_uncertainty=EEA_daily_uncertainty)
+}
+
+my_kalman_filter <- function(data_y, kalman_start) {
+  at <- Pt <- Pt_4smooth <- rep(NA, length(data_y))
+  vt <- Ft <- Kt <- Kt_4smooth <- rep(NA, length(data_y))
+  at[1] <- kalman_start$a_1
+  Pt[1] <- Pt_4smooth[1] <- kalman_start$P_1
+  sigma_eps <- kalman_start$sigma_eps
+  sigma_eta <- kalman_start$sigma_eta
+  n <- length(data_y)
+  for (i in 1:n) {
+    vt[i] <- data_y[i] - at[i]
+    Ft[i] <- Pt[i] + (sigma_eps^2)
+    Kt[i] <- Pt[i] / Ft[i]
+    Kt_4smooth[i] <- Pt_4smooth[i] / (Pt_4smooth[i] + sigma_eps^2)
+    if (i==n){next}
+    Pt_4smooth[i + 1] <- Pt_4smooth[i] * (1 - Kt_4smooth[i]) + (sigma_eta^2)
+    if (is.na(data_y[i])) {
+      Kt[i] <- 0
+      at[i + 1] <- at[i]
+      Pt[i + 1] <- Pt[i]  + sigma_eta^2
+    }else{
+      at[i + 1] <- at[i] + Kt[i] * vt[i]
+      Pt[i + 1] <- Pt[i] * (1 - Kt[i]) + (sigma_eta^2)
+    }
+  }
+  return(list(
+    state = at,
+    variance = Pt,
+    Kalman_gain = Kt,
+    var_innovations = Ft,
+    innovations_hat = vt,
+    data_y = data_y,
+    Pt_4smooth = Pt_4smooth,
+    Kt_4smooth = Kt_4smooth
+  ))
+}
+
+my_kalman_smoother <- function(data_y, kalman_start) {
+  filt <- my_kalman_filter(data_y, kalman_start = kalman_start)
+  at <- filt[[1]]
+  vt <- data_y - at
+  Pt <- filt[[2]]
+  Ft <- Pt + (kalman_start$sigma_eps^2)
+  Kt <- filt[[3]]
+  Lt <- 1 - Kt
+  at_smooth <- rt <- rep(NA, length(data_y))
+  Vt <- Nt <- rep(NA, length(data_y))
+  rt[length(data_y)] <- 0
+  Nt[length(data_y)] <- 0
+  for (i in length(rt):2) {
+    if (is.na(data_y[i])) {
+      rt[i - 1] <- rt[i]
+      Nt[i - 1] <-  ((Lt[i]^2) * Nt[i]) 
+    } else{
+      rt[i - 1] <- (vt[i] / (Ft[i])) + (Lt[i] * rt[i])
+      Nt[i - 1] <- (1 / Ft[i]) + ((Lt[i]^2) * Nt[i])
+    }
+    at_smooth[i] <- at[i] + (Pt[i] * rt[i - 1])
+    Vt[i] <- Pt[i] - ((Pt[i]^2) * Nt[i - 1])
+  }
+  at_smooth[1] <- at[1]
+  Vt[1] <- Pt[1]
+  return(data.frame(
+    state = at_smooth,
+    variance = Vt,
+    Lt = Lt,
+    Nt = Nt,
+    Pt_filter = Pt,
+    data_y = data_y
+    # Kt = Kt,
+    # Ft = Ft,
+    # rt = rt,
+    # at_filter =at,
+    # vt = vt
+  ))
 }

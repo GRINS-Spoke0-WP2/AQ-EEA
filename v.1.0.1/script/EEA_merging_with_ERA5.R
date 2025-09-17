@@ -13,5 +13,5 @@ names(AQ.CLIM_v100)[8:55]<-paste0("AQ_",names(AQ.CLIM_v100)[8:55])
 names(AQ.CLIM_v100)[56:64]<-paste0("WE_",names(AQ.CLIM_v100)[56:64])
 
 save(AQ.CLIM_v100, file = "AQ-EEA/v.1.0.1/data/AQ.CLIM_v100.rda")
-AQ.CLIM_IT1323<-AQ.CLIM_v100
-save(AQ.CLIM_IT1323, file = "AQ-EEA/v.1.0.1/data/AQ.CLIM_IT1323.rda")
+AiQuClimItaly<-AQ.CLIM_v100
+save(AiQuClimItaly, file = "AQ-EEA/v.1.0.1/data/AiQuClimItaly.rda")

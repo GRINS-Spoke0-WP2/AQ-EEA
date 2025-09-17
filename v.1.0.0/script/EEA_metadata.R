@@ -1,5 +1,6 @@
 library(httr)
-setwd("AQ-EEA/v.1.0.0")
+try(setwd("AQ-EEA/v.1.0.0"))
+try(setwd("v.1.0.0"))
 download.file("https://discomap.eea.europa.eu/map/fme/metadata/PanEuropean_metadata.csv",
               destfile = "data/raw_metadata.csv")
 
@@ -27,7 +28,7 @@ PanEuropean_metadata <-
 
 metadataEEA<-unique(PanEuropean_metadata[,c(1,3,5:14)])
 metadataEEA<-metadataEEA[metadataEEA$Countrycode=="IT",]
-metadataEEA <- unique(metadataEEA[, c(2, 7,8,11, 12)])
+metadataEEA <- unique(metadataEEA[, c(2, 7,8,9,11, 12)])
 idx <- which(duplicated(metadataEEA$AirQualityStation))
 a <- metadataEEA[idx, ]
 a <- metadataEEA[c(idx,idx-1), ]
@@ -58,7 +59,7 @@ stazioni_corrette <- stazioni_corrette[!duplicated(stazioni_corrette$AirQualityS
 metadataEEA <- metadataEEA[!duplicated(metadataEEA$AirQualityStation),]
 metadataEEA <- metadataEEA[!metadataEEA$AirQualityStation %in% stazioni_corrette$AirQualityStation,]
 metadataEEA <- rbind(metadataEEA,stazioni_corrette)
-save(metadataEEA,file = "AQ-EEA/v.1.0.0/data/metadataEEA.Rdata")
+save(metadataEEA,file = "data/metadataEEA.Rdata")
 
 #STA.IT2245A traffic 
 #STA.IT0709A background 
