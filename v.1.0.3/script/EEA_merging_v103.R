@@ -184,9 +184,8 @@ save(GRINS_AQCLIM_points_Italy, file = "v.1.0.3/data/Zenodo/GRINS_AQCLIM_points_
 load("v.1.0.3/data/GRINS_AQCLIM_points_Italy.rda")
 GRINS_AQCLIM_points_Italy$CL_winddir<-as.factor(GRINS_AQCLIM_points_Italy$CL_winddir)
 for (y in c(2013,2015,2017,2019,2021,2023)) {
-  d <- as.Date(paste0(y,"-01-01"))
-  d_end <- as.Date(paste0(y+1,"-12-31"))
-  sub <- subset(GRINS_AQCLIM_points_Italy,GRINS_AQCLIM_points_Italy$time > d & GRINS_AQCLIM_points_Italy$time < d_end)
+  y2 <- c(y,y+1)
+  sub <- subset(GRINS_AQCLIM_points_Italy,format(time,"%Y") %in% y2)
   write.table(
     sub,
     file = paste0("v.1.0.3/data/Zenodo/GRINS_AQCLIM_points_Italy_y",y,y+1,".csv"), #adjust 2023

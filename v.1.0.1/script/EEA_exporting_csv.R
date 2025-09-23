@@ -29,7 +29,7 @@ AiQuClimItaly$WE_winddir<-as.factor(AiQuClimItaly$WE_winddir)
 for (y in c(2013,2015,2017,2019,2021,2023)) {
   d <- as.Date(paste0(y,"-01-01"))
   d_end <- as.Date(paste0(y+1,"-12-31"))
-  sub <- subset(AiQuClimItaly,AiQuClimItaly$time > d & AiQuClimItaly$time < d_end)
+  sub <- subset(AiQuClimItaly,AiQuClimItaly$time > d & AiQuClimItaly$time < d_end) #abbiamo escluso gli estremi!
   write.table(
   cbind(
     sub[, 1:2],
