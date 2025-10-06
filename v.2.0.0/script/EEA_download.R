@@ -12,10 +12,10 @@ fileName <- "EEA_raw_data.zip"
 request_body <- list(
   countries = list("IT"),
   cities = list(),
-  pollutants = list("NO2", "NOX as NO2", "PM10"),
+  pollutants = list("NO2"),
   dataset = 2,
-  dateTimeStart = "2024-02-01T00:00:00Z",
-  dateTimeEnd = "2024-02-03T23:59:59Z",
+  dateTimeStart = "2024-01-01T00:00:00Z",
+  dateTimeEnd = "2024-01-01T23:59:59Z",
   aggregationType = "hour",
   email = "alessandro.fustamoro@unibg.it"
 )
@@ -38,4 +38,6 @@ status_code(response) == 200
 download.file(downloadFile, zip_path, mode = "wb")
 
 message("Download completato: ", zip_path)
+
+
 
