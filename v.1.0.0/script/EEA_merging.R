@@ -50,3 +50,36 @@ for (p in EEA_pol) {
 }
 AQ_EEA_v100_df <- EEA_all_daily
 save(AQ_EEA_v100_df,file="data/daily/AQ_EEA_v100_df.rda")
+
+# AGGIORNATO PER AQCLEM
+# download.file("https://discomap.eea.europa.eu/map/fme/metadata/PanEuropean_metadata.csv",
+#               destfile = file.path(A32_path_merge,"raw_metadata.csv"))
+# 
+# PanEuropean_metadata <-
+#   read_delim(
+#     file.path(A32_path_merge,"raw_metadata.csv"),
+#     delim = "\t",
+#     escape_double = FALSE,
+#     col_types = cols(
+#       Timezone = col_skip(),
+#       Namespace = col_skip(),
+#       AirQualityStationNatCode = col_skip(),
+#       SamplingPoint = col_skip(),
+#       SamplingProces = col_skip(),
+#       Sample = col_skip(),
+#       EquivalenceDemonstrated = col_skip(),
+#       MeasurementEquipment = col_skip(),
+#       InletHeight = col_skip(),
+#       BuildingDistance = col_skip(),
+#       KerbDistance = col_skip()
+#     ),
+#     trim_ws = TRUE
+#   )
+# metadataEEA<-unique(PanEuropean_metadata[,c("Countrycode","AirQualityStation",
+#                                             "AirPollutantCode","ObservationDateBegin",
+#                                             "ObservationDateEnd","Projection","Longitude","Latitude",
+#                                             "Altitude","MeasurementType","AirQualityStationType","AirQualityStationArea")])
+# metadataEEA<-metadataEEA[metadataEEA$Countrycode=="IT",]
+# metadataEEA <- unique(metadataEEA[, c("AirQualityStation","Longitude","Latitude",
+#                                       "Altitude","AirQualityStationType","AirQualityStationArea")])
+
