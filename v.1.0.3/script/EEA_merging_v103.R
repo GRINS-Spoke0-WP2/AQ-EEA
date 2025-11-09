@@ -9,7 +9,7 @@ gc()
 try(setwd("AQ-EEA"))
 
 daily_files <- list.files("v.1.0.2/data/daily/1p_1s", pattern = ".Rdata")
-uncertainty_files <- daily_files[grep("uncertainty",daily_files)] #TO DO!
+uncertainty_files <- daily_files[grep("uncertainty",daily_files)]
 daily_files <- setdiff(daily_files,uncertainty_files)
 load(paste0("v.1.0.2/data/daily/1p_1s/", daily_files[1]))
 AirQualityStation <- unique(EEA_daily$AirQualityStation)
@@ -135,25 +135,27 @@ Station_registry_information <- meta_aq
 # save(Station_registry_information,file = "v.1.0.3/data/Zenodo/Station_registry_information.rda")
 # adding geographies
 library(sf)
-geometries_GRINS_LAUs <- readRDS("~/Library/Mobile Documents/com~apple~CloudDocs/Lavoro/PhD Bergamo/R/GitHub/GRINS-Spoke0-WP2/LAU-ALL/v.1.0.0/data.nosync/AMELIA/geometries_GRINS_LAUs.rds")
+geometries_GRINS_LAUs <- readRDS("~/Library/Mobile Documents/com~apple~CloudDocs/Lavoro/PhD Bergamo/R/GitHub/GRINS-Spoke0-WP2/LAU-ALL/v.1.0.0/data.nosync/AMELIA/metadata_GRINS_LAUs.rds")
 coordinates(meta_aq)<-c("Longitude","Latitude")
 crs_wgs84 <- CRS(SRS_string = "EPSG:4326")
 slot(meta_aq, "proj4string") <- crs_wgs84
-aq_eea_df <- cbind(meta_aq@data,over(meta_aq,as_Spatial(st_transform(geometries_GRINS_LAUs,st_crs(4326)))))
+aq_eea_df <- cbind(meta_aq@data,meta_aq@coords,over(meta_aq,as_Spatial(st_transform(geometries_GRINS_LAUs,st_crs(4326)))))
+# added coordinates and moved to version v.1.0.5
 # names(aq_eea_df)
-aq_eea_df <- aq_eea_df[,c("AirQualityStation","Altitude","AirQualityStationType",
+aq_eea_df <- aq_eea_df[,c("AirQualityStation","Longitude","Latitude","Altitude","AirQualityStationType",
                           "AirQualityStationArea","COD_RIP","COD_REG","COD_PROV",
                           "COD_CM","COD_UTS","PRO_COM","PRO_COM_T","COMUNE","Shape_Area")]
-names(aq_eea_df)[13]<-"Area comune"
+names(aq_eea_df)[15]<-"Area comune"
 Station_registry_information <- aq_eea_df
-save(Station_registry_information,file = "v.1.0.4/data/Zenodo/Station_registry_information.rda")
+# save(Station_registry_information,file = "v.1.0.4/data/Zenodo/Station_registry_information.rda")
+save(Station_registry_information,file = "v.1.0.5/data/Zenodo/Station_registry_information.rda")
 write.table(
   cbind(
     Station_registry_information[, 1],
     format(Station_registry_information[, c(3:4)], digits = 9, scientific =
              F),
     Station_registry_information[, 4:ncol(Station_registry_information)]),
-  file = "v.1.0.4/data/Zenodo/Station_registry_information.CSV",
+  file = "v.1.0.5/data/Zenodo/Station_registry_information.CSV",
   row.names = F,
   col.names = names(Station_registry_information),
   quote = F,
