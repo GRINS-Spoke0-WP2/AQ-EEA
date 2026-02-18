@@ -10,26 +10,19 @@ library(aws.s3)
 # skippare controllo certificato https per produzione
 
 Sys.setenv(
-  "AWS_ACCESS_KEY_ID" = "tuo_access_key",
-  "AWS_SECRET_ACCESS_KEY" = "tua_secret_key",
-  "AWS_DEFAULT_REGION" = "us-east-1",     # puoi lasciare così
-  "AWS_S3_ENDPOINT" = "https://tuo-minio-server.example.com"  # URL del tuo MinIO
+  "AWS_ACCESS_KEY_ID" = "aqclim-user",
+  "AWS_SECRET_ACCESS_KEY" = "q96f!MyFAgxnE1dD#U$5",
+  "AWS_DEFAULT_REGION" = "us-east-1",
+  "AWS_S3_ENDPOINT" = "http://192.168.0.51:82"   # MinIO senza HTTPS
 )
 
 put_object(
-  file = "dataset.csv",          # il file locale
+  file = "dataset.csv",          # file locale
   object = "dataset.csv",        # nome del file remoto
-  bucket = "dati-progetto",
+  bucket = "aqclim-bkt",
   base_url = Sys.getenv("AWS_S3_ENDPOINT"),
-  use_https = TRUE
+  use_https = FALSE,             # IMPORTANTISSIMO - MinIO spesso non usa SSL
+  use_path_style = TRUE          # NECESSARIO per MinIO
 )
 
-# 4. (Facoltativo) Controlla che sia stato caricato
-get_bucket("dati-progetto", base_url = Sys.getenv("AWS_S3_ENDPOINT"))
 
-# Suggerimento
-# Se vuoi caricare direttamente un data.frame senza salvare prima il file:
-
-# write.csv(mio_dataframe, "temp.csv", row.names = FALSE)
-# put_object("temp.csv", object = "mio_dataframe.csv", bucket = "dati-progetto",
-#            base_url = Sys.getenv("AWS_S3_ENDPOINT"))

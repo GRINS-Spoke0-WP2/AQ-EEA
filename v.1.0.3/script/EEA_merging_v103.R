@@ -152,7 +152,7 @@ save(Station_registry_information,file = "v.1.0.5/data/Zenodo/Station_registry_i
 write.table(
   cbind(
     Station_registry_information[, 1],
-    format(Station_registry_information[, c(3:4)], digits = 9, scientific =
+    format(Station_registry_information[, c(2:3)], digits = 9, scientific =
              F),
     Station_registry_information[, 4:ncol(Station_registry_information)]),
   file = "v.1.0.5/data/Zenodo/Station_registry_information.CSV",

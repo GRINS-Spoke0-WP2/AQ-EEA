@@ -15,7 +15,7 @@ for (i in 1:length(EEA_files)) {
                        nc - 11)
 }
 EEA_POL <- unique(EEA_POL)
-
+pol <- EEA_POL
 
 library(ggplot2)
 foreach(p = pol[7], .combine = rbind) %dopar% {
@@ -51,15 +51,16 @@ foreach(p = pol[7], .combine = rbind) %dopar% {
              iter,
              "_thr.pdf")
     pdf(name_file,width = 3.5, height = 3)
+    jpeg("new_hist.jpeg",units="in",width = 7, height = 2.5,res = 500)
     print(
       ggplot(data = df_EEA[df_EEA$Concentration > pol_thr, ]) +
         geom_histogram(aes(
           x = Concentration, fill = as.factor(AirQualityStation)
         ),
-        col = "black") +
+        col = "black",binwidth=.1) +
         theme_light() +
         theme(legend.position = "none") +
-        scale_x_continuous(breaks = 10 ^ c(1:10), trans = "pseudo_log", name = expression(mu*g/m^3)) +
+        scale_x_continuous(breaks = 10 ^ c(1:5), trans = "pseudo_log", name = expression(mu*g/m^3)) +
         scale_y_continuous(breaks = 10 ^ c(1:20), trans = "pseudo_log") 
     )
     dev.off()

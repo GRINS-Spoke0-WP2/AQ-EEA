@@ -41,7 +41,7 @@ library(sp)
 library(sf)
 library(ggplot2)
 reg24 <-
-  st_read(dsn = "geo_tools/geo_matching/v.1.0.0/dati/confini/extract_zip/Limiti01012024/Reg01012024",
+  st_read(dsn = "geo_matching/v.1.0.0/dati/confini/extract_zip/Limiti01012024/Reg01012024",
           layer = "Reg01012024_WGS84")
 Italy <- st_union(reg24)
 ggplot()+
@@ -53,7 +53,8 @@ meta_aq_sf <- st_as_sf(meta_aq)
 st_crs(meta_aq_sf)<-4326
 meta_aq_sf$AirQualityStationArea[grep("rural",meta_aq_sf$AirQualityStationArea)]<-"rural"
 # meta_aq_sf <- st_transform()
-
+jpeg("AQ-EEA/v.1.0.1/plot/localisations.jpeg",units="in",width = 6, height = 4,res = 750)
+print(
 ggplot()+
   geom_sf(data=Italy)+
   geom_sf(data=reg24,linewidth=0.1)+
@@ -62,10 +63,12 @@ ggplot()+
   scale_color_discrete(name="Station area")+scale_shape_discrete(name="Station type")+
   theme_light()+
   theme(legend.title = element_text(size = 10),#15, family = "serif"), #10
-        legend.text = element_text(size = 10))+#15,family = "serif")) #10
-  ggtitle(label = "Air Quality Monitoring Network",subtitle = "present in AQ.CLIM_IT1323")
-ggsave("AQ-EEA/v.1.0.1/plot/localisations.pdf",width = 7,height = 5)
-ggsave("AQ-EEA/v.1.0.1/plot/localisations.png",width = 7,height = 5)
+        legend.text = element_text(size = 10))#15,family = "serif")) #10
+  # ggtitle(label = "Air Quality Monitoring Network",subtitle = "present in AQ.CLIM_IT1323")
+)
+dev.off()
+# ggsave("AQ-EEA/v.1.0.1/plot/localisations.pdf",width = 7,height = 5)
+# ggsave("AQ-EEA/v.1.0.1/plot/localisations.png",width = 7,height = 5)
 aaa<-as.data.frame.matrix(table(meta_aq_sf$AirQualityStationType,meta_aq_sf$AirQualityStationArea))
 stargazer(aaa,summary=F)
 

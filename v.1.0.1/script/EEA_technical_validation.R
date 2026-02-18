@@ -30,7 +30,8 @@ sqrt(mean((grins_agri$agri_AQ_no2 - grins_agri$grins_AQ_mean_NO2)^2,na.rm=T))
 # head()
 
 summary(grins_agri)
-pdf("AQ-EEA/v.1.0.1/plot/tech_val.pdf",width = 7, height = 4)
+# pdf("AQ-EEA/v.1.0.1/plot/tech_val.pdf",width = 7, height = 4)
+jpeg("AQ-EEA/v.1.0.1/plot/tech_val.jpeg",units="in",width = 7, height = 2.5,res = 500)
 ggplot(grins_agri, aes(x = time)) +
   geom_line(aes(y = grins_AQ_max_NO2, color = "Maximum in GRINS Dataset"), linetype = 1) +
   geom_line(aes(y = grins_AQ_mean_NO2, color = "Mean in GRINS Dataset"), linetype = 1) +
@@ -88,7 +89,8 @@ sub4 <- merge(sub_we,temp,all=T)
 sqrt(mean((sub4$WE_t2m - sub4$t2m)^2,na.rm=T))
 
 # sub4$t2m[sub4$t2m==-999]<-NA
-pdf("AQ-EEA/v.1.0.1/plot/tech_val2.pdf",width = 7, height = 3)
+# pdf("AQ-EEA/v.1.0.1/plot/tech_val2.pdf",width = 7, height = 3)
+jpeg("AQ-EEA/v.1.0.1/plot/tech_val2.jpeg",units="in",width = 7, height = 2.5,res = 500)
 ggplot(sub4, aes(x = time)) +
   geom_line(aes(y = WE_t2m, color = "ARPA"), linetype = 1) +
   geom_line(aes(y = t2m, color = "GRINS Dataset"), linetype = 1)+

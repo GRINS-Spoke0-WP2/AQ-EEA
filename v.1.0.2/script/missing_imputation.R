@@ -117,9 +117,9 @@ if (na_idx_k[1] == T) {
 }
 library(imputeTS)
 na_k_aut <- na_kalman(sub$Concentration)
-y_kalm <- KalmanSmooth(sub$Concentration, str1$model)
+# y_kalm <- KalmanSmooth(sub$Concentration, str1$model)
 # my_y_kalm <- my_kalman_smoother(sub$Concentration) # GO DOWN!
-sd_eps <- 1
+sd_eps <- 0
 sd_eta <- as.numeric(sqrt(str1$coef[1]))
 kalman_start <- list(
   a_1 = sub$Concentration[na_rm_init+1],
@@ -133,36 +133,39 @@ my_y_kalm <- my_kalman_smoother(sub$Concentration,
 
 library(ggplot2)
 
-set.seed(18)
+sub$state <- my_y_kalm$state
+sub$var <- my_y_kalm$variance
+
+set.seed(35)
 d <- sample(as_date(sub$DatetimeBegin[is.na(sub$Concentration)]),1)
 d_x <- seq.POSIXt(
   from = as.POSIXct(paste0(as.character(min(
-    as_date(d)
+    as_date(d-3)
   )), " 00:00:00"), tz = "Etc/GMT-1"),
   to = as.POSIXct(paste0(as.character(max(
-    as_date(d)
+    as_date(d+3)
   )), " 23:00:00"), tz = "Etc/GMT-1"),
   by = "hours"
 )
-sub$state <- my_y_kalm$state
-sub$var <- my_y_kalm$variance
+
+jpeg("AQ-EEA/v.1.0.2/plot/missing_imputation_uncertainty.jpeg",units="in",width = 7, height = 2.5,res = 500)
 ggplot(sub,aes(x=DatetimeBegin))+
+  geom_ribbon(aes(ymin=pmax(0,state - sqrt(pmax(var,0))),
+                  ymax=state + sqrt(pmax(var,0))),alpha=.1,col="orange",fill="yellow")+
   geom_line(aes(y=Concentration))+
-  coord_cartesian(xlim = c(d_x[1],d_x[24]),ylim = c(0,75))+
+  coord_cartesian(xlim = c(d_x[1],d_x[length(d_x)]),ylim = c(0,75))+
   geom_line(aes(y=state),col="red",linetype=2)+
-  geom_ribbon(aes(ymin=state - 1.96*sqrt(var),
-                  ymax=state + 1.96*sqrt(var)),alpha=.1,col="orange",fill="yellow")+
   theme_light()+
   ylab(expression(mu*g/m^3))+
   xlab("time")
-
-ggsave("AQ-EEA/v.1.0.2/plot/missing_imputation_uncertainty.pdf",width = 7, height = 3)
+dev.off()
+# ggsave("AQ-EEA/v.1.0.2/plot/missing_imputation_uncertainty.pdf",width = 7, height = 3)
 
 ##
 data_y <- sub$Concentration[-c(1:na_rm_init)]
 
-sub$Concentration[na_idx_k] <- c(y_kalm[[1]])[na_idx_k]
-sub$var_kalman <- c(y_kalm[[2]])
-sub$var_kalman[!na_idx_k] <- 0
+# sub$Concentration[na_idx_k] <- c(y_kalm[[1]])[na_idx_k]
+# sub$var_kalman <- c(y_kalm[[2]])
+# sub$var_kalman[!na_idx_k] <- 0
 # sub$Concentration <- na_kalman(sub$Concentration)
-sub$time <- as_date(sub$DatetimeBegin)
+# sub$time <- as_date(sub$DatetimeBegin)

@@ -5,3 +5,5 @@ v.1.0.0/data/daily/AQ_EEA_v100_df.rda
 *.rda
 *.parquet
 *.zip
+/v.3.0.0/data
+v.4.0.0/AQ_EEA_v400_df.rds
